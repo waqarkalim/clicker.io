@@ -16,7 +16,8 @@ import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import socketIOClient from "socket.io-client";
 // import openSocket from "socket.io-client";
 // const ENDPOINT = "http://192.168.4.26:3001";
-const ENDPOINT = "http://localhost:5000";
+// const ENDPOINT = "http://localhost:5000";
+const ENDPOINT = "";
 
 function uuidv4() {
   return "xxxxxxxx".replace(/[xy]/g, function (c) {
