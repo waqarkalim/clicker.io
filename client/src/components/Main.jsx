@@ -49,7 +49,7 @@ class Main extends Component {
       socketIO: null,
       id: null,
       username: "",
-      userList: [],
+      users: [],
     };
   }
 
@@ -76,8 +76,8 @@ class Main extends Component {
           this.state.socketIO.on("count", (data) => {
             this.setState({ count: data });
           });
-          this.state.socketIO.on("userList", (data) => {
-            this.setState({ userList: data });
+          this.state.socketIO.on("users", (data) => {
+            this.setState({ users: data });
           });
         }
       );
@@ -128,7 +128,7 @@ class Main extends Component {
       response,
       socketIO,
       username,
-      userList,
+      users,
     } = this.state;
     return (
       <>
@@ -279,7 +279,7 @@ class Main extends Component {
         ) : null}
         {startGame ? (
           <>
-            {/* {userList.map((user) => {
+            {/* {users.map((user) => {
               return (
                 <Typography variant="body">{`${user}`}</Typography>
               )
@@ -293,7 +293,7 @@ class Main extends Component {
             >
               <Grid container item xs={12} spacing={0}>
                 <React.Fragment>
-                  {userList.map((user) => {
+                  {users.map((user) => {
                     return (
                       <Grid
                         item

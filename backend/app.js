@@ -64,13 +64,32 @@ const io = socketIo(server, {
 });
 
 const timeElapsedBetweenButtonPresses = 500;
-const roomCountMap = {};
-const roomDataMap = {};
-const roomUserList = {};
+
+const roomMap = {};
+const socket2RoomMap = {};
+
+/*
+
+{
+  'room': {
+    'count': int,
+    'latest': obj,
+    'users': {
+
+    }
+    // 'users': [
+    //   {
+    //     'id': string,
+    //     'username': string
+    //   }, 
+    //   ... 
+    // ]
+  }
+}
+
+*/
 
 let interval;
-
-// var count = 0;
 
 io.on("connection", (socket) => {
   console.log("New client connected");
@@ -81,58 +100,53 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("Client disconnected");
     clearInterval(interval);
-  });
-});
+    // const room = socket2RoomMap[socket.id];
 
-io.on("connection", (socket) => {
+    // roomMap[room].users = roomMap[room].users.filter(item => item.socket_id != socket.id)
+    // io.sockets.in(room).emit("users", roomMap[room].users.map(item => item.username));
+  });
+
   socket.on("room", async (data) => {
     const room = data.room;
-    const username = data.username;
 
-    // roomUserList.push(username);
-    if (roomUserList[room]) {
-      roomUserList[room].push(username);
+    // socket2RoomMap[socket.id] = room;
+
+    const user = {
+      socket_id: socket.id,
+      id: data.id,
+      username: data.username,
+    }
+
+    const username = user.username;
+
+    if (roomMap[room]) {
+      roomMap[room].users.push(user);
     } else {
-      roomUserList[room] = [];
-      roomUserList[room].push(username);
+      roomMap[data.room] = {
+        count: 0,
+        latest: "",
+        users: [],
+      };
+      roomMap[room].users.push(user);
     }
 
     socket.join(room);
 
-    // if (roomCountMap[room]) {
-    //   io.sockets.in(room).emit("count", roomCountMap[room]);
-    // } else {
-    //   roomCountMap[room] = 0;
-    //   io.sockets.in(room).emit("count", roomCountMap[room]);
-    // }
-
-    // const data = {
-    //   room: roomCountMap[room],
-    //   roomUserList: roomUserList,
-    // }
-
-    if (!(room in roomCountMap)) {
-      roomCountMap[room] = 0;
-    }
-    io.sockets.in(room).emit("count", roomCountMap[room]);
-    io.sockets.in(room).emit("userList", roomUserList[room]);
+    io.sockets.in(room).emit("count", roomMap[room].count);
+    io.sockets.in(room).emit("users", roomMap[room].users.map(item => item.username));
 
     console.log(`User ${username} joined Room ${room}`);
   });
-});
 
-io.on("connection", (socket) => {
   socket.on("buttonPress", (data) => {
     if (data.room) {
-      if (!(data.room in roomDataMap)) {
-        roomDataMap[data.room] = [];
-        console.log(roomDataMap);
+      if (!(data.room in roomMap)) {
+        roomMap[data.room].latest = "";
       }
 
-      const mostRecentButtomPress =
-        roomDataMap[data.room][roomDataMap[data.room].length - 1];
+      const mostRecentButtomPress = roomMap[data.room].latest;
 
-      roomDataMap[data.room].push(data);
+      roomMap[data.room].latest = data;
       socket.in(data.room).emit(data);
 
       if (
@@ -145,15 +159,17 @@ io.on("connection", (socket) => {
           mostRecentButtomPress.id === data.id)
       ) {
         // If the users messed up
-        roomCountMap[data.room] = 0;
-        roomDataMap[data.room] = [];
-        io.sockets.in(data.room).emit("count", roomCountMap[data.room]);
+        roomMap[data.room].count = 0;
+        roomMap[data.room].latest = "";
+
+        io.sockets.in(data.room).emit("count", roomMap[data.room].count);
         console.log("You done messed up!");
       } else {
-        // If they didn't mess up
-        roomCountMap[data.room] = roomCountMap[data.room] + 1;
-        io.sockets.in(data.room).emit("count", roomCountMap[data.room]);
+        // If the users didn't mess up
+        roomMap[data.room].count = roomMap[data.room].count + 1;
+        io.sockets.in(data.room).emit("count", roomMap[data.room].count);
       }
+      console.log(roomMap);
     }
   });
 });
@@ -167,4 +183,3 @@ const getApiAndEmit = (socket) => {
 server.listen(port, () => console.log(`Listening on port ${port}`));
 
 module.exports = app;
-// export default app;
