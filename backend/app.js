@@ -22,7 +22,7 @@ var app = express();
 
 const responseArray = [];
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -81,8 +81,8 @@ const socket2RoomMap = {};
     //   {
     //     'id': string,
     //     'username': string
-    //   }, 
-    //   ... 
+    //   },
+    //   ...
     // ]
   }
 }
