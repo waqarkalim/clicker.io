@@ -91,17 +91,15 @@ io.on("connection", (socket) => {
   interval = (() => getApiAndEmit(socket), 1000);
 
   // When client disconnects
-  socket.on("disconnect", (data) => {
-    console.log(data);
+  socket.on("disconnect", () => {
     console.log("Client disconnected");
-    clearInterval(interval);
 
-    const client_id = data.id;
-    const room_id = data.room_id;
+    const client_id = socket.id;
+    const room_id = socket2RoomMap[client_id]
 
     if (house.doesRoomExist(room_id)) {
       house.getRoom(room_id).deleteUser(client_id);
-      io.sockets.in(room).emit("users", house.getRoom(room_id).getUsers());
+      io.sockets.in(room_id).emit("users", house.getRoom(room_id).getUsers());
 
       console.log(`User ${client_id} has left room ${room_id}`);
     }
@@ -116,18 +114,18 @@ io.on("connection", (socket) => {
     if (!house.doesRoomExist(room_id)) {
       house.createRoom(room_id);
     }
-    
+
     socket.join(room_id);
+    socket2RoomMap[socket.id] = room_id;
 
     const room = house.getRoom(room_id);
 
-    room.setUser(data.id, new User(data.id, data.username, socket.id));
-
+    room.setUser(socket.id, new User(data.id, data.username, socket.id));
 
     io.sockets.in(room_id).emit("count", room.getCount());
     io.sockets.in(room_id).emit("users", room.getUsers());
 
-    console.log(`User ${room.getUser(data.id)}`);
+    console.log(`User ${room.getUser(socket.id)}`);
   });
 
   // When the client presses the button
@@ -139,15 +137,15 @@ io.on("connection", (socket) => {
       return;
     }
 
-    const client_id = data.id;
+    const client_id = socket.id;
     const room_id = data.room;
-    
+
     const room = house.getRoom(room_id);
 
-    if ( room instanceof Error ) {
+    if (room instanceof Error) {
       console.error(room.message);
       return;
-    } 
+    }
 
     const mostRecentButtomPress = room.getLatest();
 
@@ -176,7 +174,7 @@ io.on("connection", (socket) => {
       // Good click
       room.incrementCount();
       room.getUser(client_id).incrementScore();
-      
+
       console.log("Successful click! Incrementing count...");
     }
 

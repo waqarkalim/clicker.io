@@ -78,10 +78,11 @@ class Main extends Component {
     });
 
     return () =>
-      this.socketIO.emit("disconnect", {
-        id: this.state.id,
-        room: this.state.room,
-      });
+      this.socketIO.disconnect()
+      // this.socketIO.emit("disconnect", {
+      //   id: this.state.id,
+      //   room: this.state.room,
+      // });
   }
 
   joinRoom = () => {
