@@ -95,14 +95,37 @@ io.on("connection", (socket) => {
     console.log("Client disconnected");
 
     const client_id = socket.id;
-    const room_id = socket2RoomMap[client_id]
+    const room_id = socket2RoomMap[client_id];
 
     if (house.doesRoomExist(room_id)) {
+      console.log(
+        `User ${house
+          .getRoom(room_id)
+          .getUser(client_id)
+          .getName()} has left room ${room_id}`
+      );
+
       house.getRoom(room_id).deleteUser(client_id);
       io.sockets.in(room_id).emit("users", house.getRoom(room_id).getUsers());
 
-      console.log(`User ${client_id} has left room ${room_id}`);
+      // If the room has no users, destroy the room
+      if (house.getRoom(room_id).getUsers().length === 0) {
+        house.destroyRoom(room_id);
+        console.log(`Room ${room_id} destroyed`);
+      }
     }
+  });
+
+  socket.on("change game status", (data) => {
+    const client_id = socket.id;
+    const room_id = socket2RoomMap[client_id];
+
+    if (data) {
+      house.getRoom(room_id).startGame();
+    } else {
+      house.getRoom(room_id).stopGame();
+    }
+    io.sockets.in(room_id).emit("change game status", data);
   });
 
   // When a new user joins a room
@@ -125,7 +148,19 @@ io.on("connection", (socket) => {
     io.sockets.in(room_id).emit("count", room.getCount());
     io.sockets.in(room_id).emit("users", room.getUsers());
 
-    console.log(`User ${room.getUser(socket.id)}`);
+    console.log(`New User added: ${room.getUser(socket.id)}`);
+  });
+
+  socket.on("user update time", (data) => {
+    const room_id = socket2RoomMap[socket.id];
+    const room = house.getRoom(room_id);
+
+    const user = room.getUser(socket.id);
+
+    // user.setScore(data.score);
+    user.setTimeRemaining(data);
+    // console.log(`Time Remaining updated for user ${socket.id}`);
+    io.sockets.in(room_id).emit("users", room.getUsers());
   });
 
   // When the client presses the button
@@ -174,6 +209,7 @@ io.on("connection", (socket) => {
       // Good click
       room.incrementCount();
       room.getUser(client_id).incrementScore();
+      room.getUser(client_id).setTimeRemaining(room.getInitialRoomTime());
 
       console.log("Successful click! Incrementing count...");
     }
@@ -181,6 +217,8 @@ io.on("connection", (socket) => {
     io.sockets.in(room_id).emit("count", room.getCount());
     io.sockets.in(room_id).emit("users", house.getRoom(room_id).getUsers());
   });
+
+  // setTimeout(() => { },1000);
 });
 
 const getApiAndEmit = (socket) => {

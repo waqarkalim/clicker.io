@@ -57,8 +57,24 @@ const useStyles = makeStyles((theme) => ({
 
 function User(props) {
   const classes = useStyles();
-  const { name, score, timeRemaining } = props;
+  const {
+    name,
+    score,
+    timeRemaining,
+    socketIO,
+    isTheGameStartedInTheRoom,
+    setIsGameCompleted
+  } = props;
   const [remainingTime, setRemainingTime] = useState(0);
+  const [duration, setDuration] = useState(20);
+
+  useEffect(() => {
+    socketIO.emit("user update time", remainingTime);
+  }, [remainingTime, socketIO]);
+
+  useEffect(() => {
+    socketIO.emit("user update time", duration);
+  }, [score, duration, socketIO]);
 
   return (
     <>
@@ -75,10 +91,14 @@ function User(props) {
           <Paper elevation={5} square className={classes.timer}>
             <CountdownCircleTimer
               key={score}
-              isPlaying
-              duration={20}
+              isPlaying={isTheGameStartedInTheRoom}
+              duration={duration}
+              onComplete={() => {setIsGameCompleted(true)}}
+              initialRemainingTime={
+                isTheGameStartedInTheRoom ? timeRemaining - 1 : timeRemaining
+              }
               strokeWidth={3}
-              size={50} 
+              size={50}
               colors={[
                 ["#004777", 0.33],
                 ["#F7B801", 0.33],
@@ -88,7 +108,7 @@ function User(props) {
               {({ remainingTime }) => {
                 setRemainingTime(remainingTime);
                 return remainingTime;
-                }}
+              }}
             </CountdownCircleTimer>
           </Paper>
         </div>

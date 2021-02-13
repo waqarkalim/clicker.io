@@ -1,8 +1,18 @@
 class Room {
     constructor() {
+        this.start = false;
         this.count = 0;
         this.latest = '';
         this.users = {};
+        this.initialRoomTime = 20;
+    }
+
+    startGame() {
+        this.start = true;
+    }
+
+    stopGame() {
+        this.start = false;
     }
 
     getCount() {
@@ -43,6 +53,10 @@ class Room {
 
     getUsers() {
         return Object.values(this.users);
+    }
+
+    getInitialRoomTime() {
+        return this.initialRoomTime;
     }
 
     reset() {

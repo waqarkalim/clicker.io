@@ -4,7 +4,7 @@ class User {
     this.name = name;
     this.socket_id = socket_id;
     this.score = 0;
-    this.timeRemaining = -1;
+    this.timeRemaining = 20;
   }
 
   getId() {

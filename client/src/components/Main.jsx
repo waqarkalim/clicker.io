@@ -55,6 +55,7 @@ class Main extends Component {
       id: null,
       username: "",
       users: [],
+      isTheGameStartedInTheRoom: false,
     };
   }
 
@@ -63,26 +64,42 @@ class Main extends Component {
   };
 
   componentDidMount() {
-    this.setState({ id: generateUniqueNumber() }, () => {
-      this.setState(
-        { socketIO: socketIOClient(ENDPOINT, { transport: ["websocket"] }) },
-        () => {
-          this.state.socketIO.on("count", (data) => {
-            this.setState({ count: data });
-          });
-          this.state.socketIO.on("users", (data) => {
-            this.setState({ users: data });
-          });
-        }
-      );
-    });
+    this.setState(
+      {
+        id: generateUniqueNumber(),
+        socketIO: socketIOClient(ENDPOINT, { transport: ["websocket"] }),
+      },
+      () => {
+        this.state.socketIO.on("count", (data) => {
+          this.setState({ count: data });
+        });
+        this.state.socketIO.on("users", (data) => {
+          this.setState({ users: data });
+        });
+        this.state.socketIO.on("change game status", (data) => {
+          this.setState({ isTheGameStartedInTheRoom: data });
+        });
+      }
+    );
+    // this.setState({ id: generateUniqueNumber() }, () => {
+    //   this.setState(
+    //     { socketIO: socketIOClient(ENDPOINT, { transport: ["websocket"] }) },
+    //     () => {
+    //       this.state.socketIO.on("count", (data) => {
+    //         this.setState({ count: data });
+    //       });
+    //       this.state.socketIO.on("users", (data) => {
+    //         this.setState({ users: data });
+    //       });
+    //     }
+    //   );
+    // });
 
-    return () =>
-      this.socketIO.disconnect()
-      // this.socketIO.emit("disconnect", {
-      //   id: this.state.id,
-      //   room: this.state.room,
-      // });
+    return () => this.socketIO.disconnect();
+    // this.socketIO.emit("disconnect", {
+    //   id: this.state.id,
+    //   room: this.state.room,
+    // });
   }
 
   joinRoom = () => {
@@ -111,6 +128,7 @@ class Main extends Component {
       socketIO,
       username,
       users,
+      isTheGameStartedInTheRoom,
     } = this.state;
     return (
       <>
@@ -263,9 +281,9 @@ class Main extends Component {
             username={username}
             users={users}
             startGame={startGame}
+            isTheGameStartedInTheRoom={isTheGameStartedInTheRoom}
           />
-        ) : 
-        null}
+        ) : null}
       </>
     );
   }

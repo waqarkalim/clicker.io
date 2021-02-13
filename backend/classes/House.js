@@ -18,6 +18,10 @@ class House {
         this.house[room] = new Room();
     }
 
+    destroyRoom(room) {
+        delete this.house[room];
+    }
+
     doesRoomExist(room) {
         return (room in this.house);
     }

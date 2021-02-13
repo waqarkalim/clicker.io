@@ -22,7 +22,7 @@ import UserCard from "./UserCard";
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
-    padding: theme.spacing(2)
+    padding: theme.spacing(2),
   },
   paper: {
     padding: theme.spacing(2),
@@ -51,7 +51,19 @@ const useStyles = makeStyles((theme) => ({
 
 function GameScreen(props) {
   const classes = useStyles();
-  const { id, count, room, socketIO, username, users, startGame } = props;
+
+  const [isGameCompleted, setIsGameCompleted] = useState(false);
+
+  const {
+    id,
+    count,
+    room,
+    socketIO,
+    username,
+    users,
+    startGame,
+    isTheGameStartedInTheRoom,
+  } = props;
   const pageSize = 5;
 
   // useEffect(() => {
@@ -108,6 +120,10 @@ function GameScreen(props) {
     socketIO.emit("buttonPress", data);
   };
 
+  const startGameButton = () => {
+    socketIO.emit("change game status", true);
+  };
+
   return (
     <>
       <Grid
@@ -128,6 +144,9 @@ function GameScreen(props) {
                         name={user.name}
                         score={user.score}
                         timeRemaining={user.timeRemaining}
+                        socketIO={socketIO}
+                        isTheGameStartedInTheRoom={isTheGameStartedInTheRoom}
+                        setIsGameCompleted={(data) => setIsGameCompleted(data)}
                       />
                     </Grid>
                   </>
@@ -140,17 +159,36 @@ function GameScreen(props) {
         <Grid item xs={12}>
           <Typography>{`Room Id: ${room}`}</Typography>
           <Typography variant="h1">{count}</Typography>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            // ref={countingButtonPress}
-            onClick={() => {
-              handleButtonPress();
-            }}
-          >
-            Press Me
-          </Button>
+
+          {isTheGameStartedInTheRoom ? (
+            <>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                // ref={countingButtonPress}
+                onClick={() => {
+                  handleButtonPress();
+                }}
+              >
+                Press Me
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                // ref={countingButtonPress}
+                onClick={() => {
+                  startGameButton();
+                }}
+              >
+                Start Game
+              </Button>
+            </>
+          )}
         </Grid>
         <Grid item xs={12}></Grid>
       </Grid>
