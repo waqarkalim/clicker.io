@@ -18,6 +18,10 @@ var usersRouter = require("./routes/users");
 
 var app = express();
 
+const User = require("./classes/User");
+const House = require("./classes/House");
+const Room = require("./classes/Room");
+
 // dotenv.config();
 
 const responseArray = [];
@@ -31,12 +35,16 @@ app.set("view engine", "jade");
 app.use(cors());
 // app.use(logger("dev"));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(
+  express.urlencoded({
+    extended: false,
+  })
+);
 // app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "../client/build")));
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '../client/build/index.html'))
-})
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname + "../client/build/index.html"));
+});
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
@@ -71,26 +79,7 @@ const timeElapsedBetweenButtonPresses = 500;
 const roomMap = {};
 const socket2RoomMap = {};
 
-/*
-
-{
-  'room': {
-    'count': int,
-    'latest': obj,
-    'users': {
-
-    }
-    // 'users': [
-    //   {
-    //     'id': string,
-    //     'username': string
-    //   },
-    //   ...
-    // ]
-  }
-}
-
-*/
+const house = new House();
 
 let interval;
 
@@ -100,80 +89,99 @@ io.on("connection", (socket) => {
     clearInterval(interval);
   }
   interval = (() => getApiAndEmit(socket), 1000);
-  socket.on("disconnect", () => {
+
+  // When client disconnects
+  socket.on("disconnect", (data) => {
+    console.log(data);
     console.log("Client disconnected");
     clearInterval(interval);
-    // const room = socket2RoomMap[socket.id];
 
-    // roomMap[room].users = roomMap[room].users.filter(item => item.socket_id != socket.id)
-    // io.sockets.in(room).emit("users", roomMap[room].users.map(item => item.username));
+    const client_id = data.id;
+    const room_id = data.room_id;
+
+    if (house.doesRoomExist(room_id)) {
+      house.getRoom(room_id).deleteUser(client_id);
+      io.sockets.in(room).emit("users", house.getRoom(room_id).getUsers());
+
+      console.log(`User ${client_id} has left room ${room_id}`);
+    }
   });
 
-  socket.on("room", async (data) => {
-    const room = data.room;
+  // When a new user joins a room
+  socket.on("new user", (data) => {
+    const room_id = data.room;
+    console.log(`id: ${data.id}`);
 
-    // socket2RoomMap[socket.id] = room;
-
-    const user = {
-      socket_id: socket.id,
-      id: data.id,
-      username: data.username,
+    // If this user is the first user to join the room, then create the room
+    if (!house.doesRoomExist(room_id)) {
+      house.createRoom(room_id);
     }
+    
+    socket.join(room_id);
 
-    const username = user.username;
+    const room = house.getRoom(room_id);
 
-    if (roomMap[room]) {
-      roomMap[room].users.push(user);
-    } else {
-      roomMap[data.room] = {
-        count: 0,
-        latest: "",
-        users: [],
-      };
-      roomMap[room].users.push(user);
-    }
+    room.setUser(data.id, new User(data.id, data.username, socket.id));
 
-    socket.join(room);
 
-    io.sockets.in(room).emit("count", roomMap[room].count);
-    io.sockets.in(room).emit("users", roomMap[room].users.map(item => item.username));
+    io.sockets.in(room_id).emit("count", room.getCount());
+    io.sockets.in(room_id).emit("users", room.getUsers());
 
-    console.log(`User ${username} joined Room ${room}`);
+    console.log(`User ${room.getUser(data.id)}`);
   });
 
+  // When the client presses the button
   socket.on("buttonPress", (data) => {
-    if (data.room) {
-      if (!(data.room in roomMap)) {
-        roomMap[data.room].latest = "";
-      }
-
-      const mostRecentButtomPress = roomMap[data.room].latest;
-
-      roomMap[data.room].latest = data;
-      socket.in(data.room).emit(data);
-
-      if (
-        (mostRecentButtomPress !== undefined &&
-          data.room === mostRecentButtomPress.room &&
-          data.timestamp - mostRecentButtomPress.timestamp <
-            timeElapsedBetweenButtonPresses) ||
-        (mostRecentButtomPress !== undefined &&
-          data.room === mostRecentButtomPress.room &&
-          mostRecentButtomPress.id === data.id)
-      ) {
-        // If the users messed up
-        roomMap[data.room].count = 0;
-        roomMap[data.room].latest = "";
-
-        io.sockets.in(data.room).emit("count", roomMap[data.room].count);
-        console.log("You done messed up!");
-      } else {
-        // If the users didn't mess up
-        roomMap[data.room].count = roomMap[data.room].count + 1;
-        io.sockets.in(data.room).emit("count", roomMap[data.room].count);
-      }
-      console.log(roomMap);
+    if (!data.room) {
+      console.log(
+        "For some weird reason, you're clicking without being in a room."
+      );
+      return;
     }
+
+    const client_id = data.id;
+    const room_id = data.room;
+    
+    const room = house.getRoom(room_id);
+
+    if ( room instanceof Error ) {
+      console.error(room.message);
+      return;
+    } 
+
+    const mostRecentButtomPress = room.getLatest();
+
+    console.log(room.getUsers());
+
+    room.setLatest(data);
+
+    if (
+      mostRecentButtomPress !== undefined &&
+      data.room === mostRecentButtomPress.room &&
+      mostRecentButtomPress.id === data.id
+    ) {
+      // Void click
+      console.log("Void click...");
+      return;
+    } else if (
+      mostRecentButtomPress !== undefined &&
+      data.room === mostRecentButtomPress.room &&
+      data.timestamp - mostRecentButtomPress.timestamp <
+        timeElapsedBetweenButtonPresses
+    ) {
+      // Bad click
+      room.reset();
+      console.log("Failed click! Resetting...");
+    } else {
+      // Good click
+      room.incrementCount();
+      room.getUser(client_id).incrementScore();
+      
+      console.log("Successful click! Incrementing count...");
+    }
+
+    io.sockets.in(room_id).emit("count", room.getCount());
+    io.sockets.in(room_id).emit("users", house.getRoom(room_id).getUsers());
   });
 });
 

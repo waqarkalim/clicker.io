@@ -11,12 +11,15 @@ import {
 
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 
+import GameScreen from "./GameScreen";
+
 // import ClientComponent from "./ClientComponent";
 
 import socketIOClient from "socket.io-client";
 // import openSocket from "socket.io-client";
 // const ENDPOINT = "http://192.168.4.26:3001";
 // const ENDPOINT = "http://localhost:5000";
+
 const ENDPOINT = "";
 
 function uuidv4() {
@@ -59,18 +62,7 @@ class Main extends Component {
     el.click();
   };
 
-  countingButtonPress = (event) => {
-    const { startGame } = this.state;
-    if (startGame) {
-      if (event?.keyCode === 32) {
-        this.handleButtonPress();
-      }
-    }
-  };
-
   componentDidMount() {
-    document.addEventListener("keydown", this.countingButtonPress, false);
-
     this.setState({ id: generateUniqueNumber() }, () => {
       this.setState(
         { socketIO: socketIOClient(ENDPOINT, { transport: ["websocket"] }) },
@@ -85,40 +77,27 @@ class Main extends Component {
       );
     });
 
-    return () => this.socketIO.disconnect();
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener("keydown", this.countingButtonPress, false);
+    return () =>
+      this.socketIO.emit("disconnect", {
+        id: this.state.id,
+        room: this.state.room,
+      });
   }
 
   joinRoom = () => {
-    const { room, socketIO, username } = this.state;
-    const data = {
-      room: room,
-      username: username,
-    };
-    socketIO.emit("room", data);
-    this.setState({ startGame: true });
-  };
-
-  handleButtonPress = () => {
-    const { id, count, room, socketIO, username } = this.state;
-    // this.setState({ count: count+1});
-
+    const { id, room, socketIO, username } = this.state;
     const data = {
       id: id,
       room: room,
-      message: "Hello World",
-      timestamp: Date.now(),
       username: username,
     };
-    console.log(data);
-    socketIO.emit("buttonPress", data);
+    socketIO.emit("new user", data);
+    this.setState({ startGame: true });
   };
 
   render() {
     const {
+      id,
       room,
       count,
       loadClient,
@@ -134,7 +113,6 @@ class Main extends Component {
     } = this.state;
     return (
       <>
-        {/* <Typography variant="h1">Addiction With Extra Steps</Typography> */}
         {!startGame ? (
           <>
             {startingScreen && (
@@ -269,10 +247,6 @@ class Main extends Component {
                 {roomIdGenerated ? (
                   <>
                     <Typography>{room}</Typography>
-                    {/* <TextField
-          value={room}
-          disabled={true}
-        /> */}
                   </>
                 ) : null}
               </>
@@ -280,70 +254,17 @@ class Main extends Component {
           </>
         ) : null}
         {startGame ? (
-          <>
-            {/* {users.map((user) => {
-              return (
-                <Typography variant="body">{`${user}`}</Typography>
-              )
-            })} */}
-            <Grid
-              container
-              spacing={0}
-              align="center"
-              justify="center"
-              direction="column"
-            >
-              <Grid container item xs={12} spacing={0}>
-                <React.Fragment>
-                  {users.map((user) => {
-                    return (
-                      <Grid
-                        item
-                        xs
-                        align={"center"}
-                        alignItems={"center"}
-                        justify={"center"}
-                      >
-                        <CountdownCircleTimer
-                          isPlaying
-                          duration={10}
-                          strokeWidth={5}
-                          size={60}
-                          colors={[
-                            ["#004777", 0.33],
-                            ["#F7B801", 0.33],
-                            ["#A30000", 0.33],
-                          ]}
-                        >
-                          {({ remainingTime }) => remainingTime}
-                        </CountdownCircleTimer>
-                        <Typography variant="body">{`${user}`}</Typography>
-                      </Grid>
-                    );
-                  })}
-                </React.Fragment>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography>{`Room Id: ${room}`}</Typography>
-                <Typography variant="h1">{count}</Typography>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  ref={this.countingButtonPress}
-                  onClick={() => {
-                    this.handleButtonPress();
-                    // this.setState({count: count+1});
-                    // setCount(count + 1);
-                  }}
-                >
-                  Press Me
-                </Button>
-              </Grid>
-              <Grid item xs={12}></Grid>
-            </Grid>
-          </>
-        ) : null}
+          <GameScreen
+            id={id}
+            count={count}
+            room={room}
+            socketIO={socketIO}
+            username={username}
+            users={users}
+            startGame={startGame}
+          />
+        ) : 
+        null}
       </>
     );
   }
