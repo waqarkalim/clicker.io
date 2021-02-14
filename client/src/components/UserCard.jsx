@@ -27,6 +27,7 @@ const useStyles = makeStyles((theme) => ({
     elevation: 5,
     justifyContent: "center",
     overflow: "hidden",
+    spacing: theme.spacing.unit * 2
   },
   timerContainer: {
     padding: theme.spacing.unit * 2,
