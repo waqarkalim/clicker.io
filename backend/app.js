@@ -147,6 +147,7 @@ io.on("connection", (socket) => {
 
     io.sockets.in(room_id).emit("count", room.getCount());
     io.sockets.in(room_id).emit("users", room.getUsers());
+    io.sockets.in(room_id).emit("change game status", room.getGameStatus());
 
     console.log(`New User added: ${room.getUser(socket.id)}`);
   });
@@ -188,6 +189,7 @@ io.on("connection", (socket) => {
 
     room.setLatest(data);
 
+    // Logic for clicks
     if (
       mostRecentButtomPress !== undefined &&
       data.room === mostRecentButtomPress.room &&
@@ -204,6 +206,7 @@ io.on("connection", (socket) => {
     ) {
       // Bad click
       room.reset();
+
       console.log("Failed click! Resetting...");
     } else {
       // Good click

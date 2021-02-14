@@ -7,6 +7,10 @@ class Room {
         this.initialRoomTime = 20;
     }
 
+    getGameStatus() {
+        return this.start;
+    }
+
     startGame() {
         this.start = true;
     }

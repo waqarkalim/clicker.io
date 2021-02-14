@@ -179,7 +179,8 @@ function GameScreen(props) {
               <Button
                 type="submit"
                 variant="contained"
-                color="primary"
+                color="secondary"
+                // color={"#757ce8"}
                 // ref={countingButtonPress}
                 onClick={() => {
                   startGameButton();
