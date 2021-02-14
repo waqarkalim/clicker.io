@@ -42,6 +42,7 @@ app.use(
 );
 // app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "../client/build")));
+// Uncomment the line below and see what happens
 // app.get("*", (req, res) => {
 //   res.sendFile(path.join(__dirname + "../client/build/index.html"));
 // });
@@ -158,9 +159,7 @@ io.on("connection", (socket) => {
 
     const user = room.getUser(socket.id);
 
-    // user.setScore(data.score);
     user.setTimeRemaining(data);
-    // console.log(`Time Remaining updated for user ${socket.id}`);
     io.sockets.in(room_id).emit("users", room.getUsers());
   });
 
@@ -168,7 +167,7 @@ io.on("connection", (socket) => {
   socket.on("buttonPress", (data) => {
     if (!data.room) {
       console.log(
-        "For some weird reason, you're clicking without being in a room."
+        "For some weird reason, you managed to get this far and are clicking the room counter button without being in a room."
       );
       return;
     }
@@ -185,7 +184,7 @@ io.on("connection", (socket) => {
 
     const mostRecentButtomPress = room.getLatest();
 
-    console.log(room.getUsers());
+    // console.log(room.getUsers());
 
     room.setLatest(data);
 
