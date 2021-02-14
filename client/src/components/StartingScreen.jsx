@@ -41,6 +41,9 @@ const useStyles = (theme) => ({
     margin: 'auto',
     left: '10%'
   },
+  roomInput: {
+      color: 'white',
+  }
 });
 
 class StartingScreen extends React.Component {
@@ -199,9 +202,11 @@ class StartingScreen extends React.Component {
                     if (event.key === "Enter") {
                       this.joinRoom();
                       this.setState({ startGame: true });
-
                       event.preventDefault();
                     }
+                  }}
+                  InputProps={{
+                    className: classes.roomInput
                   }}
                 />
                 <Button
