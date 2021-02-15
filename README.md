@@ -22,5 +22,5 @@ To run the client: `cd client && npm install && npm run start`
 * [ReactJS](https://reactjs.org/)
 * [NodeJS](https://nodejs.org/en/)
 * [Express](https://expressjs.com/)
-* [Socket.io](https://socket.io/)
+* [Socket.IO](https://socket.io/)
 * [Material-UI](https://material-ui.com/)
