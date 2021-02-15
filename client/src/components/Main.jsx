@@ -11,6 +11,7 @@ import {
 
 import { Link } from "react-router-dom";
 
+
 const Main = () => (
   <div>
     <Typography variant="h1" style={{ padding: "0.5em" }}>
@@ -18,14 +19,14 @@ const Main = () => (
     </Typography>
     <Grid container spacing={3}>
       <Grid item xs={12}>
-        <Link to="/start">
+        <Link to="/start" style={{textDecoration: "none"}}>
           <Button variant={"contained"} color={"primary"} size={"large"}>
             Start
           </Button>
         </Link>
       </Grid>
       <Grid item xs={12}>
-        <Link to="/how-to-play">
+        <Link to="/how-to-play" style={{textDecoration: "none"}}>
           <Button variant={"contained"} color={"primary"} size={"large"}>
             How To Play
           </Button>
