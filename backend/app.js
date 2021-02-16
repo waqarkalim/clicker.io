@@ -182,29 +182,32 @@ io.on("connection", (socket) => {
       return;
     }
 
-    const mostRecentButtomPress = room.getLatest();
+    const mostRecentButtonPress = room.getLatest();
 
     // console.log(room.getUsers());
 
-    room.setLatest(data);
+    room.setLatest(Object.assign(data, { socket_id: client_id }));
 
     // Logic for clicks
     if (
-      mostRecentButtomPress !== undefined &&
-      data.room === mostRecentButtomPress.room &&
-      mostRecentButtomPress.id === data.id
+      mostRecentButtonPress !== undefined &&
+      data.room === mostRecentButtonPress.room &&
+      mostRecentButtonPress.id === data.id
     ) {
       // Void click
       console.log("Void click...");
       return;
     } else if (
-      mostRecentButtomPress !== undefined &&
-      data.room === mostRecentButtomPress.room &&
-      data.timestamp - mostRecentButtomPress.timestamp <
+      mostRecentButtonPress !== undefined &&
+      data.room === mostRecentButtonPress.room &&
+      data.timestamp - mostRecentButtonPress.timestamp <
         timeElapsedBetweenButtonPresses
     ) {
       // Bad click
       room.reset();
+
+      io.in(data.socket_id).emit("bad click", true);
+      io.in(mostRecentButtonPress.socket_id).emit("bad click", true);
 
       console.log("Failed click! Resetting...");
     } else {

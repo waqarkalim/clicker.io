@@ -35,15 +35,15 @@ const useStyles = (theme) => ({
   },
   goBackButton: {
     // margin: theme.spacing(1),
-    border: '1px solid #3f51b5',
-    position: 'absolute',
-    bottom: '10%',
-    margin: 'auto',
-    left: '10%'
+    border: "1px solid #3f51b5",
+    position: "absolute",
+    bottom: "10%",
+    margin: "auto",
+    left: "10%",
   },
   roomInput: {
-      color: 'white',
-  }
+    color: "white",
+  },
 });
 
 class StartingScreen extends React.Component {
@@ -61,6 +61,7 @@ class StartingScreen extends React.Component {
       createRoomChecked: false,
       joinRoomChecked: false,
       startGame: false,
+      playAudio: false,
     };
   }
   componentDidMount() {
@@ -81,6 +82,11 @@ class StartingScreen extends React.Component {
         });
         this.state.socketIO.on("change game status", (data) => {
           this.setState({ isTheGameStartedInTheRoom: data });
+        });
+        this.state.socketIO.on("bad click", (data) => {
+          if (data === true) {
+            this.setState({ playAudio: true });
+          }
         });
       }
     );
@@ -115,6 +121,7 @@ class StartingScreen extends React.Component {
       username,
       users,
       isTheGameStartedInTheRoom,
+      playAudio,
     } = this.state;
     return (
       <>
@@ -206,7 +213,7 @@ class StartingScreen extends React.Component {
                     }
                   }}
                   InputProps={{
-                    className: classes.roomInput
+                    className: classes.roomInput,
                   }}
                 />
                 <Button
@@ -234,6 +241,10 @@ class StartingScreen extends React.Component {
             users={users}
             startGame={startGame}
             isTheGameStartedInTheRoom={isTheGameStartedInTheRoom}
+            playAudio={playAudio}
+            changeAudio={(audioStatus) => {
+              this.setState({ playAudio: audioStatus });
+            }}
           />
         ) : null}
       </>
