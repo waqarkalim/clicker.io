@@ -14,7 +14,7 @@ You can check out the app here: https://frozen-headland-67972.herokuapp.com/
 * Ability to detect when player joins a room
 
 ### Setup
-To install dependencies: `npm install && npm run install_dep`
+To install dependencies: `npm run install_dep`
 
 To run the app on localhost: `npm run dev`
 
