@@ -7,7 +7,7 @@
     "start": "npm install && cd backend && npm install && node app.js",
     "heroku-postbuild": "cd client && npm install && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "install_dep": "cd client && npm install && cd ../backend && npm install",
+    "install_dep": "npm install && cd client && npm install && cd ../backend && npm install",
     "client": "cd client && npm run start",
     "server": "cd backend && npm run start",
     "dev": "concurrently \"npm run server\" \"PORT=3001 npm run client\""
