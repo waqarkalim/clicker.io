@@ -3,11 +3,6 @@
 
 Clicker.io is a multiplayer game based on the popular icebreaker - "Count to 20".
 
-It is powered by Socket.io and Express which together provide the main real time communication functionality and it also utilizes ReactJS for the frontend UI.
-
-You can check out the app here: https://frozen-headland-67972.herokuapp.com/
-
-
 ## Features
 
 - Material Design
