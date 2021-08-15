@@ -46,7 +46,7 @@ Start the app
   
 ## Demo
 
-Insert gif or link to demo
+Demo deployed on Heroku, so initial page load will take a few minutes
 
   https://frozen-headland-67972.herokuapp.com/
 ## Feedback
