@@ -20,6 +20,12 @@ Clone the project
   git clone https://github.com/waqarkalim/clicker.io.git
 ```
 
+Go to the project directory
+
+```bash
+  cd clicker.io
+```
+
 Install dependencies
 
 ```bash
@@ -63,11 +69,6 @@ Demo deployed on Heroku, so initial page load will take a few minutes
 
 ## Feedback
 
-If you have any feedback, please reach out to us at waqaar.199@gmail.com.
+If you have any feedback, please reach out to me at waqaar.199@gmail.com.
 
-  
-## Support
-
-For support, email waqaar.199@gmail.com.
-
-  
+ 
