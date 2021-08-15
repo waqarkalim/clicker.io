@@ -54,7 +54,7 @@ Demo deployed on Heroku, so initial page load will take a few minutes
 ## Screenshots
 
 ##### Home Screen
-![App Screenshot](https://github.com/waqarkalim/clicker.io/blob/master/img/Home.png "Home Screen")  
+![App Screenshot](https://github.com/waqarkalim/clicker.io/blob/master/img/Home.png "Home Screen") ![App Screenshot](https://github.com/waqarkalim/clicker.io/blob/master/img/Home-mobile.png "Home Screen (Mobile)")   
 ##### Starting Screen
 ![App Screenshot](https://github.com/waqarkalim/clicker.io/blob/master/img/Start.png "Starting Screen")  
 ##### Starting Screen With Create Room Option
