@@ -3,6 +3,11 @@
 
 Clicker.io is a multiplayer game based on the popular icebreaker - "Count to 20".
 
+It is powered by Socket.io and Express which together provide the main real time communication functionality and it also utilizes ReactJS for the frontend UI.
+
+You can check out the app here: https://frozen-headland-67972.herokuapp.com/
+
+
 ## Features
 
 - Material Design
@@ -44,8 +49,29 @@ Start the app
 Demo deployed on Heroku, so initial page load will take a few minutes
 
   https://frozen-headland-67972.herokuapp.com/
+## Screenshots
+
+##### Home Screen
+![App Screenshot](https://github.com/waqarkalim/clicker.io/blob/master/img/Home.png "Home Screen")  
+##### Starting Screen
+![App Screenshot](https://github.com/waqarkalim/clicker.io/blob/master/img/Start.png "Starting Screen")  
+##### Starting Screen With Create Room Option
+![App Screenshot](https://github.com/waqarkalim/clicker.io/blob/master/img/Start-create.png "Starting Screen With Create Room Option")  
+##### Starting Screen With Join Room Option
+![App Screenshot](https://github.com/waqarkalim/clicker.io/blob/master/img/Start-join.png "Starting Screen With Join Room Option")  
+##### Gameplay Screen With Game Not Started
+![App Screenshot](https://github.com/waqarkalim/clicker.io/blob/master/img/Gameplay-not-started.png "Gameplay Screen With Game Not Started")  
+##### Gameplay Screen With Game Started
+![App Screenshot](https://github.com/waqarkalim/clicker.io/blob/master/img/Gameplay-started.png "Gameplay Screen With Game Started")    
+
+
 ## Feedback
 
-If you have any feedback, please reach out to us at waqaar.199@gmail.com
+If you have any feedback, please reach out to us at waqaar.199@gmail.com.
+
+  
+## Support
+
+For support, email waqaar.199@gmail.com.
 
   
